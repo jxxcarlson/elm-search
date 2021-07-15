@@ -27,8 +27,8 @@ queryCaseSenstiive  term =
     Word str -> (\datum -> datum.content == str)
     NotWord str -> (\datum -> datum.content /= str)
     Conjunction terms -> (\datum -> List.foldl (\term_ acc -> matchCaseSenstive term_  datum.content && acc) True terms)
-    BeforeDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  <= (Time.toMillis Time.utc dt))
-    AfterDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  >= (Time.toMillis Time.utc dt))
+    BeforeDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  < (Time.toMillis Time.utc dt))
+    AfterDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  > (Time.toMillis Time.utc dt))
 
     
 
