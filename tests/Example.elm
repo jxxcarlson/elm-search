@@ -7,8 +7,8 @@ import Parse exposing(parse)
 import APITypes exposing(Datum, Term(..))
 import Search exposing(search)
 import Filter exposing(sort, SortParam(..), Direction(..))
-import Time
-import Search exposing (SearchConfig(..), posixGTE, posixLTE, posixGTEForData, posixLTEForData)
+import Time exposing(Posix)
+import Search exposing (SearchConfig(..), posixGTE, searchWithTerm, posixLTE, posixGTEForDatum, posixLTEForDatum)
 
 
 
@@ -38,12 +38,12 @@ suite =
              \_ ->
                 search NotCaseSensitive "foo" data
                     |> Expect.equal [d2,d3]
-            ,  skip <|  test "date search (0)" <|
+            ,  test "date search (0)" <|
              \_ ->
                 search NotCaseSensitive "@before:9/1/2001" [d1, d2, d3, d4, d5]
                     |> Expect.equal [d1, d2, d3]
 
-          ,  skip <| test "date search (1)" <|
+          ,  test "date search (1)" <|
              \_ ->
                 search NotCaseSensitive "@after:9/1/2001" [d1, d2, d3, d4, d5]
                     |> Expect.equal [d3, d4, d5]
@@ -88,30 +88,43 @@ suite =
                \_ -> posixLTE july august
                 |> Expect.equal True
 
-
-
-
-
-           , test "posixLTEForData (1)" <|
-             \_ -> posixLTEForData augustDatum june
+           , test "posixLTEForDatum (1)" <|
+             \_ -> posixLTEForDatum augustDatum june
              |> Expect.equal False
 
 
-           , test "posixLTEForData (2)" <|
-             \_ -> posixLTEForData juneDatum august
+           , test "posixLTEForDatum (2)" <|
+             \_ -> posixLTEForDatum juneDatum august
              |> Expect.equal True
 
 
 
-           , test "posixGTEForData (1)" <|
-             \_ -> posixGTEForData augustDatum june
+           , test "posixGTEForDatum (1)" <|
+             \_ -> posixGTEForDatum augustDatum june
              |> Expect.equal True
 
 
            , test "posixGTEForData (2)" <|
-             \_ -> posixGTEForData juneDatum august
+             \_ -> posixGTEForDatum juneDatum august
              |> Expect.equal False
 
+           , test "searchWithTerm (1)" <| 
+             \_ ->  searchWithTerm CaseSensitive beforeJuly_ [juneDatum]
+               |> Expect.equal [{ content = "JUNE", dateTime = Time.millisToPosix 1622591999000 }]
+
+           , test "searchWithTerm (2)" <| 
+             \_ ->  searchWithTerm CaseSensitive afterJuly_ [juneDatum]
+               |> Expect.equal []
+
+         , test "search (1)" <| 
+             \_ ->  search CaseSensitive "@before:7/1/2021" [juneDatum]
+               |> Expect.equal [{ content = "JUNE", dateTime = Time.millisToPosix 1622591999000 }]
+
+        , test "search (2)" <| 
+             \_ ->  search CaseSensitive "@after:7/1/2021" [juneDatum]
+               |> Expect.equal []
+
+ 
         ]
 
 
@@ -128,23 +141,24 @@ d4= { content = "bar yada", dateTime =  october }
 
 d5= { content = "doo yada", dateTime = november } 
 
-
+beforeJuly_ = BeforeDateTime (Time.millisToPosix 1625183999000)
+afterJuly_ = AfterDateTime (Time.millisToPosix 1625183999000)
 juneDatum = { content = "JUNE", dateTime =  june } 
 julyDatum = { content = "JULY", dateTime =  july } 
 
 augustDatum = { content = "AUGUST", dateTime =  august } 
 
-june = Time.millisToPosix 991439999000
-july = Time.millisToPosix 994031999000
+june = Time.millisToPosix 1622591999000
+july = Time.millisToPosix 1625183999000
 
-august = Time.millisToPosix 996710399000
+august = Time.millisToPosix 1627862399000
 
-september = Time.millisToPosix 999388799000
+september = Time.millisToPosix 1630540799000
 
 
-october = Time.millisToPosix 1001980799000
+october = Time.millisToPosix 1633132799000
 
-november = Time.millisToPosix 1004659199000
+november = Time.millisToPosix 1635811199000
 
 data = [d1, d2, d3, d4, d5]
 

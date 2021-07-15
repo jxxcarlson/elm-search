@@ -1,4 +1,4 @@
-module APITypes exposing (Datum, Term(..), nullTerm)
+module APITypes exposing (Datum, Term(..), nullTerm, afterJuly_, beforeJuly_)
 
 import Time
 
@@ -14,6 +14,9 @@ type Term
     | BeforeDateTime Time.Posix
     | AfterDateTime Time.Posix
 
+
+beforeJuly_ = BeforeDateTime (Time.millisToPosix 1625183999000)
+afterJuly_ = AfterDateTime (Time.millisToPosix 1625183999000)
 
 nullTerm = Word "null"
 
