@@ -1,4 +1,4 @@
-module APITypes exposing (Datum, Term(..))
+module APITypes exposing (Datum, Term(..), nullTerm)
 
 import Time
 
@@ -15,6 +15,7 @@ type Term
     | AfterDateTime Time.Posix
 
 
+nullTerm = Word "null"
 
 -- type alias Configuration= {
 --       sort : List Sort

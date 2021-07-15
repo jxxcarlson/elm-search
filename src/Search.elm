@@ -1,4 +1,12 @@
-module Search exposing (search, SearchConfig(..))
+module Search exposing (..)
+
+
+{-
+
+(search, SearchConfig(..))
+
+-}
+
 
 import Parse exposing(parse)
 import APITypes exposing(Term(..), Datum)
@@ -27,8 +35,8 @@ queryCaseSenstiive  term =
     Word str -> (\datum -> datum.content == str)
     NotWord str -> (\datum -> datum.content /= str)
     Conjunction terms -> (\datum -> List.foldl (\term_ acc -> matchCaseSenstive term_  datum.content && acc) True terms)
-    BeforeDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  < (Time.toMillis Time.utc dt))
-    AfterDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  > (Time.toMillis Time.utc dt))
+    BeforeDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  <= (Time.toMillis Time.utc dt))
+    AfterDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  >= (Time.toMillis Time.utc dt))
 
     
 
@@ -38,10 +46,21 @@ queryNotCaseSenstiive  term =
     Word str -> (\datum -> datum.content == str)
     NotWord str -> (\datum -> datum.content /= str)
     Conjunction terms -> (\datum -> List.foldl (\term_ acc -> matchNotCaseSenstive term_  datum.content && acc) True terms)
-    BeforeDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  <= (Time.toMillis Time.utc dt))
-    AfterDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  >= (Time.toMillis Time.utc dt))
+    BeforeDateTime dt -> (\datum ->   posixLTEForData datum dt) 
+    AfterDateTime dt -> (\datum ->   posixGTEForData datum dt) 
 
 
+posixGTE a b = Time.posixToMillis a >= Time.posixToMillis  b
+
+posixGTEForData a b = Time.posixToMillis a.dateTime >= Time.posixToMillis  b
+
+posixLTE a b = Time.posixToMillis a <= Time.posixToMillis  b
+
+
+posixLTEForData : { x | dateTime: Time.Posix } -> Time.Posix -> Bool
+posixLTEForData a b = Time.posixToMillis a.dateTime <= Time.posixToMillis  b
+
+posixZero = Time.millisToPosix 0
 
 matchCaseSenstive : Term -> String -> Bool
 matchCaseSenstive  term str = 
