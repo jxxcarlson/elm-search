@@ -1,4 +1,4 @@
-module Parse exposing (dateTimeFromDateString, beforeDate, afterDate, posixFromDateString, parse)
+module Parse exposing (parse)
 
 import APITypes exposing (..)
 import DateTime
@@ -45,7 +45,7 @@ conjunction =
 beforeDate : Parser Term
 beforeDate = 
   Parser.succeed(\s -> posixFromDateString s.content |> Maybe.withDefault (Time.millisToPosix 0) |> BeforeDateTime)
-    |. Parser.symbol "before:"
+    |. Parser.symbol "@before:"
     |= text (\c -> c /= ' ') (\c -> c /= ' ')
 
 
@@ -56,7 +56,7 @@ beforeDate =
 afterDate : Parser  Term 
 afterDate = 
   Parser.succeed(\s -> posixFromDateString s.content |> Maybe.withDefault (Time.millisToPosix 0) |> AfterDateTime)
-    |. Parser.symbol "after:"
+    |. Parser.symbol "@after:"
     |= text (\c -> c /= ' ') (\c -> c /= ' ')   
 {-|
 
@@ -80,7 +80,7 @@ term =
 -}
 positiveWord : Parser Term
 positiveWord =
-    text (\c -> c /= ' ') (\c -> c /= ' ') |> Parser.map .content |> Parser.map Word
+    text Char.isAlphaNum (\c -> c /= ' ') |> Parser.map .content |> Parser.map Word
 
 
 {-|
@@ -94,6 +94,6 @@ negativeWord : Parser Term
 negativeWord =
     (Parser.succeed (\r -> r.content)
         |. Parser.symbol "-"
-        |= text (\c -> c /= ' ') (\c -> c /= ' ')
+        |= text Char.isAlphaNum (\c -> c /= ' ')
     )
         |> Parser.map NotWord
