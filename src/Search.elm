@@ -22,10 +22,6 @@ type SearchConfig
 {-| -}
 search : SearchConfig -> String -> List (Datum data) -> List (Datum data)
 search config queryString dataList =
-    let
-        _ =
-            Debug.log "QUERY" (parse queryString)
-    in
     case parse queryString of
         Ok term ->
             searchWithTerm config term dataList
@@ -68,9 +64,7 @@ query config term =
             \datum -> posixGTEForDatum datum dt
 
         Range dt1 dt2 ->
-            --\datum -> posixGTEForDatum datum dt1 && posixLTEForDatum datum dt2
-            --\datum -> posixLTEForDatum datum dt2
-            \datum -> posixLTEForDatum datum dt2
+            \datum -> posixGTEForDatum datum dt1 && posixLTEForDatum datum dt2
 
 
 posixGTE a b =
@@ -93,19 +87,6 @@ posixLTEForDatum a b =
 
 posixZero =
     Time.millisToPosix 0
-
-
-matchCaseSenstive : Term -> String -> Bool
-matchCaseSenstive term str =
-    case term of
-        Word w ->
-            String.contains w str
-
-        NotWord w ->
-            not (String.contains w str)
-
-        _ ->
-            False
 
 
 match : SearchConfig -> Term -> Datum data -> Bool
@@ -132,6 +113,9 @@ match config term datum =
 
         AfterDateTime dt ->
             posixGTEForDatum datum dt
+
+        Range dt1 dt2 ->
+            posixGTEForDatum datum dt1 && posixLTEForDatum datum dt2
 
         _ ->
             False
