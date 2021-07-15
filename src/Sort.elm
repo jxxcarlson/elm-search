@@ -1,12 +1,14 @@
-module Filter exposing (sort, SortParam(..), Direction(..), Filter(..))
+module Sort exposing (sort, SortParam(..), Direction(..))
 
 {-|
 
-@docs sort, SortParam, Direction, Filter
+@docs sort, SortParam, Direction
 
 -}
 
 import APITypes exposing (Datum)
+import Random
+import Random.List
 import Time
 
 
@@ -14,6 +16,7 @@ import Time
 type SortParam
     = Alpha Direction
     | DateTime Direction
+    | Random Random.Seed
 
 
 
@@ -47,3 +50,6 @@ sort param dataList =
 
         DateTime Decreasing ->
             List.sortWith (\a b -> compare (Time.posixToMillis b.dateTime) (Time.posixToMillis a.dateTime)) dataList
+
+        Random seed ->
+            Random.step (Random.List.shuffle dataList) seed |> Tuple.first

@@ -1,12 +1,10 @@
-module Search exposing (..)
+module Search exposing (search, SearchConfig(..))
 
 {-|
 
 @docs search, SearchConfig
 
 -}
-
-{- (search, SearchConfig(..)) -}
 
 import APITypes exposing (Datum, Term(..))
 import Parse exposing (parse)

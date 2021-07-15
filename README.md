@@ -1,14 +1,22 @@
 # Search
 
-A library for searching lists of data y content and date
+A library for searching and sorting lists of data 
+with fields `content: String` and `dateTime: Time.Posix`.
 
 
 ## Examples
 
-The data is `colors` with element of the form
+The data is `colors` with elements of the form
 
-```elm
+```
 type alias Datum = { content: String, dateTime: Time.Posix }
+```
+
+```
+> colors 
+  |> List.map .content
+  ["alizarin yellow","brown umber","yellow ochre","pthalo blue"
+  ,"french yellow","alizarin crimson, cadmium purple"]
 ```
 
 Simple search
@@ -20,20 +28,23 @@ Simple search
   
 Search on fragments
 ```
-> search NotCaseSensitive "fr" colors |> List.map .content
+> search NotCaseSensitive "fr" colors 
+  |> List.map .content
   ["french yellow"]
 ```
 
 Conjunctive search
 ```
-> search NotCaseSensitive "yell french" colors |> List.map .content
-["french yellow"] : List String
+> search NotCaseSensitive "yell french" colors 
+  |> List.map .content
+  ["french yellow"] : List String
 ```
 
 Negation
 ```
-> search NotCaseSensitive "yell -french" colors |> List.map .content
-["alizarin yellow","yellow ochre"]
+> search NotCaseSensitive "yell -french" colors 
+  |> List.map .content
+  ["alizarin yellow","yellow ochre"]
 ```
 
 Date-time:
@@ -49,3 +60,37 @@ Date-time and word fragment
   |> List.map .content
   ["alizarin yellow"]
 ```
+
+## Sorting
+
+### Alphabetical
+
+```
+> sort (Alpha Increasing) colors 
+  |> List.map .content
+  ["alizarin crimson, cadmium purple","alizarin yellow"
+  ,"brown umber","french yellow","pthalo blue","yellow ochre"]
+```
+
+### Date
+
+```
+> sort (DateTime  Decreasing) colors |> List.map .content
+  ["alizarin crimson, cadmium purple","french yellow","pthalo blue"
+  ,"yellow ochre","brown umber","alizarin yellow"]
+```
+
+### Random order
+
+```
+> sort (Random seed1) colors 
+  |> List.map .content
+  ["alizarin crimson, cadmium purple","alizarin yellow"
+  ,"brown umber","yellow ochre","french yellow","pthalo blue"]
+  
+> sort (Random seed2) colors 
+  |> List.map .content
+  ["yellow ochre","pthalo blue","brown umber","french yellow"
+  ,"alizarin yellow","alizarin crimson, cadmium purple"]
+```
+

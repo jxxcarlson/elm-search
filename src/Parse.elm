@@ -1,7 +1,4 @@
-module Parse exposing
-    ( parse
-    , range
-    )
+module Parse exposing (parse)
 
 {-|
 

@@ -4,9 +4,9 @@ module Example exposing (..)
 
 import APITypes exposing (Datum, Term(..))
 import Expect exposing (Expectation)
-import Filter exposing (Direction(..), SortParam(..), sort)
 import Parse exposing (parse)
 import Search exposing (..)
+import Sort exposing (Direction(..), SortParam(..), sort)
 import Test exposing (..)
 import Time exposing (Posix)
 
