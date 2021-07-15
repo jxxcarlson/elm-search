@@ -1,4 +1,7 @@
-module Parse exposing (parse)
+module Parse exposing
+    ( parse
+    , range
+    )
 
 {-|
 
@@ -16,6 +19,7 @@ import Time
 
 
 {-| -}
+parse : String -> Result (List Parser.DeadEnd) Term
 parse input =
     Parser.run conjunction input
 
@@ -52,6 +56,26 @@ conjunction =
     Ok (BeforeDateTime (Posix 991439999000))
 
 -}
+range : Parser Term
+range =
+    Parser.succeed mapRange
+        |. Parser.symbol "@range:"
+        |= text (\c -> c /= ' ') (\c -> c /= ' ' && c /= ':')
+        |. Parser.symbol ":"
+        |= text (\c -> c /= ' ') (\c -> c /= ' ')
+
+
+mapRange s t =
+    let
+        ss =
+            posixFromDateString s.content |> Maybe.withDefault (Time.millisToPosix 0)
+
+        tt =
+            posixFromDateString t.content |> Maybe.withDefault (Time.millisToPosix 0)
+    in
+    Range ss tt
+
+
 beforeDate : Parser Term
 beforeDate =
     Parser.succeed (\s -> posixFromDateString s.content |> Maybe.withDefault (Time.millisToPosix 0) |> BeforeDateTime)
@@ -84,7 +108,7 @@ afterDate =
 -}
 term : Parser Term
 term =
-    Parser.oneOf [ negativeWord, positiveWord, beforeDate, afterDate ]
+    Parser.oneOf [ negativeWord, positiveWord, beforeDate, afterDate, range ]
 
 
 {-|

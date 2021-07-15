@@ -1,22 +1,28 @@
-module Search exposing (SearchConfig(..), search)
+module Search exposing (..)
 
-{-| @doc search, SearchConfig
+{-|
+
+@docs search, SearchConfig
+
 -}
+
+{- (search, SearchConfig(..)) -}
 
 import APITypes exposing (Datum, Term(..))
 import Parse exposing (parse)
 import Time
 
 
+{-| -}
 type SearchConfig
     = CaseSensitive
     | NotCaseSensitive
 
 
+{-| -}
 search : SearchConfig -> String -> List (Datum data) -> List (Datum data)
 search config queryString dataList =
     let
-        -- _ = Debug.log "SEPT" (Parse.posixFromDateString "9/1/2001")
         _ =
             Debug.log "QUERY" (parse queryString)
     in
@@ -30,27 +36,30 @@ search config queryString dataList =
 
 searchWithTerm : SearchConfig -> Term -> List (Datum data) -> List (Datum data)
 searchWithTerm config term dataList =
-    case config of
-        CaseSensitive ->
-            List.filter (queryCaseSensitive term) dataList
-
-        NotCaseSensitive ->
-            List.filter (queryNotCaseSensitive term) dataList
+    List.filter (query config term) dataList
 
 
-queryCaseSensitive : Term -> Datum data -> Bool
-queryCaseSensitive term =
+query : SearchConfig -> Term -> Datum data -> Bool
+query config term =
     case term of
         Word str ->
-            \datum -> datum.content == str
+            case config of
+                CaseSensitive ->
+                    \datum -> datum.content == str
+
+                NotCaseSensitive ->
+                    \datum -> String.toLower datum.content == String.toLower str
 
         NotWord str ->
-            \datum -> datum.content /= str
+            case config of
+                CaseSensitive ->
+                    \datum -> datum.content /= str
 
-        -- Conjunction terms -> (\datum -> List.foldl (\term_ acc -> matchCaseSenstive term_  datum.content && acc) True terms)
-        -- Conjunction terms -> (\datum -> List.foldl (\term_ acc -> queryCaseSensitive term_  datum && acc) True terms)
+                NotCaseSensitive ->
+                    \datum -> String.toLower datum.content /= String.toLower str
+
         Conjunction terms ->
-            \datum -> List.foldl (\term_ acc -> matchCaseSensitiveX term_ datum && acc) True terms
+            \datum -> List.foldl (\term_ acc -> match config term_ datum && acc) True terms
 
         BeforeDateTime dt ->
             \datum -> posixLTEForDatum datum dt
@@ -58,25 +67,10 @@ queryCaseSensitive term =
         AfterDateTime dt ->
             \datum -> posixGTEForDatum datum dt
 
-
-queryNotCaseSensitive : Term -> Datum data -> Bool
-queryNotCaseSensitive term =
-    case term of
-        Word str ->
-            \datum -> datum.content == String.toLower str
-
-        NotWord str ->
-            \datum -> datum.content /= String.toLower str
-
-        -- Conjunction terms -> (\datum -> List.foldl (\term_ acc -> matchNotCaseSenstive term_  datum.content && acc) True terms)
-        Conjunction terms ->
-            \datum -> List.foldl (\term_ acc -> matchNotCaseSensitiveX term_ datum && acc) True terms
-
-        BeforeDateTime dt ->
-            \datum -> posixLTEForDatum datum dt
-
-        AfterDateTime dt ->
-            \datum -> posixGTEForDatum datum dt
+        Range dt1 dt2 ->
+            --\datum -> posixGTEForDatum datum dt1 && posixLTEForDatum datum dt2
+            --\datum -> posixLTEForDatum datum dt2
+            \datum -> posixLTEForDatum datum dt2
 
 
 posixGTE a b =
@@ -114,52 +108,30 @@ matchCaseSenstive term str =
             False
 
 
-matchCaseSensitiveX : Term -> Datum data -> Bool
-matchCaseSensitiveX term datum =
+match : SearchConfig -> Term -> Datum data -> Bool
+match config term datum =
     case term of
         Word w ->
-            String.contains w datum.content
+            case config of
+                CaseSensitive ->
+                    String.contains w datum.content
+
+                NotCaseSensitive ->
+                    String.contains (String.toLower w) (String.toLower datum.content)
 
         NotWord w ->
-            not (String.contains w datum.content)
+            case config of
+                CaseSensitive ->
+                    not (String.contains w datum.content)
+
+                NotCaseSensitive ->
+                    not (String.contains (String.toLower w) (String.toLower datum.content))
 
         BeforeDateTime dt ->
             posixLTEForDatum datum dt
 
         AfterDateTime dt ->
             posixGTEForDatum datum dt
-
-        _ ->
-            False
-
-
-matchNotCaseSensitiveX : Term -> Datum data -> Bool
-matchNotCaseSensitiveX term datum =
-    case term of
-        Word w ->
-            String.contains w (String.toLower datum.content)
-
-        NotWord w ->
-            not (String.contains w (String.toLower datum.content))
-
-        BeforeDateTime dt ->
-            posixLTEForDatum datum dt
-
-        AfterDateTime dt ->
-            posixGTEForDatum datum dt
-
-        _ ->
-            False
-
-
-matchNotCaseSenstive : Term -> String -> Bool
-matchNotCaseSenstive term str =
-    case term of
-        Word w ->
-            String.contains w (String.toLower str)
-
-        NotWord w ->
-            not (String.contains w (String.toLower str))
 
         _ ->
             False

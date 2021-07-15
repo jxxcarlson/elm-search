@@ -21,3 +21,4 @@ type Term
     | Conjunction (List Term)
     | BeforeDateTime Time.Posix
     | AfterDateTime Time.Posix
+    | Range Time.Posix Time.Posix
