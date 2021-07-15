@@ -1,4 +1,4 @@
-module Parse exposing (dateTimeFromDateString, posixFromDateString, parse)
+module Parse exposing (dateTimeFromDateString, beforeDate, afterDate, posixFromDateString, parse)
 
 import APITypes exposing (..)
 import DateTime
@@ -6,13 +6,14 @@ import Library.DateTime
 import Library.ParserTools exposing (manySeparatedBy, text)
 import Parser exposing ((|.), (|=), Parser, run)
 import Maybe.Extra
+import Time
 
 parse input =
     Parser.run conjunction input
 
 
 posixFromDateString dateString =
-    dateString |> dateTimeFromDateString |> Maybe.map DateTime.toPosix
+    dateString |> dateTimeFromDateString |> Maybe.map DateTime.toPosix 
 
 
 
@@ -33,9 +34,30 @@ dateTimeFromDateString dateString =
 
 conjunction : Parser Term
 conjunction =
-    manySeparatedBy Parser.spaces word |> Parser.map Conjunction
+    manySeparatedBy Parser.spaces term |> Parser.map Conjunction
 
 
+
+{-|
+  > run beforeDate "before:6/1/2001"
+    Ok (BeforeDateTime (Posix 991439999000))
+-}
+beforeDate : Parser Term
+beforeDate = 
+  Parser.succeed(\s -> posixFromDateString s.content |> Maybe.withDefault (Time.millisToPosix 0) |> BeforeDateTime)
+    |. Parser.symbol "before:"
+    |= text (\c -> c /= ' ') (\c -> c /= ' ')
+
+
+{-| 
+  > run afterDate "after:6/1/2001"
+    Ok (AfterDateTime (Posix 991439999000))
+-}
+afterDate : Parser  Term 
+afterDate = 
+  Parser.succeed(\s -> posixFromDateString s.content |> Maybe.withDefault (Time.millisToPosix 0) |> AfterDateTime)
+    |. Parser.symbol "after:"
+    |= text (\c -> c /= ' ') (\c -> c /= ' ')   
 {-|
 
     > run word "foo"
@@ -45,9 +67,9 @@ conjunction =
       Ok (NotWord "bar")
 
 -}
-word : Parser Term
-word =
-    Parser.oneOf [ negativeWord, positiveWord ]
+term : Parser Term
+term =
+    Parser.oneOf [ negativeWord, positiveWord, beforeDate, afterDate ]
 
 
 {-|

@@ -74,7 +74,7 @@ optional p =
 
 
 {-| Running `optional p` means run p. If the parser succeeds with value _result_,
-return _Just result_ . If the parser failes, return Nothing.
+return _Just result_ . If the parser fails, return Nothing.
 -}
 maybe : Parser a -> Parser (Maybe a)
 maybe p =
