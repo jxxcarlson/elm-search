@@ -55,17 +55,17 @@ suite =
         ]
 
 
-d1 = { content = "alpha beta ", date = Time.millisToPosix 1000 }
+d1 = { content = "alpha beta ", dateTime =  Time.millisToPosix 1000 }
 
-d2 = { content = "alpha foo bar xx yy", date = Time.millisToPosix 2000 }
+d2 = { content = "alpha foo bar xx yy", dateTime =  Time.millisToPosix 2000 }
 
-d2b = { content = "gamma xx yy", date = Time.millisToPosix 2000 }
+d2b = { content = "gamma xx yy", dateTime = Time.millisToPosix 2000 }
 
-d3 = { content = "beta foo beta Alpha xx yy", date = Time.millisToPosix 3000 }
+d3 = { content = "beta foo beta Alpha xx yy", dateTime = Time.millisToPosix 3000 }
 
-d4= { content = "bar yada", date = Time.millisToPosix 5000 }
+d4= { content = "bar yada", dateTime =  Time.millisToPosix 5000 }
 
-d5= { content = "doo yada", date = Time.millisToPosix 6000 }
+d5= { content = "doo yada", dateTime = Time.millisToPosix 6000 }
 
 
 data = [d1, d2, d3, d4, d5]

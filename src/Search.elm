@@ -2,6 +2,7 @@ module Search exposing (search, SearchConfig(..))
 
 import Parse exposing(parse)
 import APITypes exposing(Term(..), Datum)
+import Time
 
 
 type SearchConfig = CaseSensitive | NotCaseSensitive
@@ -26,6 +27,10 @@ queryCaseSenstiive  term =
     Word str -> (\datum -> datum.content == str)
     NotWord str -> (\datum -> datum.content /= str)
     Conjunction terms -> (\datum -> List.foldl (\term_ acc -> matchCaseSenstive term_  datum.content && acc) True terms)
+    BeforeDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  <= (Time.toMillis Time.utc dt))
+    AfterDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  >= (Time.toMillis Time.utc dt))
+
+    
 
 queryNotCaseSenstiive : Term -> Datum data -> Bool
 queryNotCaseSenstiive  term =
@@ -33,6 +38,9 @@ queryNotCaseSenstiive  term =
     Word str -> (\datum -> datum.content == str)
     NotWord str -> (\datum -> datum.content /= str)
     Conjunction terms -> (\datum -> List.foldl (\term_ acc -> matchNotCaseSenstive term_  datum.content && acc) True terms)
+    BeforeDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  <= (Time.toMillis Time.utc dt))
+    AfterDateTime dt -> (\datum -> (Time.toMillis Time.utc datum.dateTime)  >= (Time.toMillis Time.utc dt))
+
 
 
 matchCaseSenstive : Term -> String -> Bool
