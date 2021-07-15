@@ -94,6 +94,6 @@ negativeWord : Parser Term
 negativeWord =
     (Parser.succeed (\r -> r.content)
         |. Parser.symbol "-"
-        |= text Char.isAlphaNum (\c -> c /= ' ')
+        |= text Char.isAlphaNum  (\c -> c /= ' ')
     )
         |> Parser.map NotWord

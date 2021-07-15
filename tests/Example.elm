@@ -50,22 +50,32 @@ suite =
             , test "sort (d)"   <|
              \_ ->
                 sort (Alpha Decreasing) [d2, d2b, d3]
-                    |> Expect.equal (List.reverse [d2, d3, d2b] ) 
+                    |> Expect.equal (List.reverse [d2, d3, d2b] )
+
+            , test "sort date, ascending" <| 
+            \_ -> sort (DateTime Increasing)  [d3, d4, d5, d1, d2]
+              |> Expect.equal [d1, d2, d3, d4, d5]
+
+            
+            , test "sort date, descending" <| 
+            \_ -> sort (DateTime Decreasing)  [d3, d4, d5, d1, d2]
+              |> Expect.equal (List.reverse [d1, d2, d3, d4, d5])
 
         ]
 
 
-d1 = { content = "alpha beta ", dateTime =  Time.millisToPosix 1000 }
+d1 = { content = "alpha beta ", dateTime =  Time.millisToPosix 991439999000 } -- 6/1/2001
 
-d2 = { content = "alpha foo bar xx yy", dateTime =  Time.millisToPosix 2000 }
 
-d2b = { content = "gamma xx yy", dateTime = Time.millisToPosix 2000 }
+d2 = { content = "alpha foo bar xx yy", dateTime =  Time.millisToPosix 994031999000 }
 
-d3 = { content = "beta foo beta Alpha xx yy", dateTime = Time.millisToPosix 3000 }
+d2b = { content = "gamma xx yy", dateTime = Time.millisToPosix 996710399000 }
 
-d4= { content = "bar yada", dateTime =  Time.millisToPosix 5000 }
+d3 = { content = "beta foo beta Alpha xx yy", dateTime = Time.millisToPosix 999388799000 }
 
-d5= { content = "doo yada", dateTime = Time.millisToPosix 6000 }
+d4= { content = "bar yada", dateTime =  Time.millisToPosix 1001980799000 }
+
+d5= { content = "doo yada", dateTime = Time.millisToPosix 1004659199000 }
 
 
 data = [d1, d2, d3, d4, d5]
