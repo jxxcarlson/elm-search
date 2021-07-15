@@ -1,26 +1,23 @@
-module APITypes exposing (Datum, Term(..), nullTerm, afterJuly_, beforeJuly_)
+module APITypes exposing (Term(..), Datum)
+
+{-|
+
+@docs Term, Datum
+
+-}
 
 import Time
 
 
+{-| -}
 type alias Datum data =
-    { data | content : String, dateTime : Time.Posix} -- dateTime = milliseconds
+    { data | content : String, dateTime : Time.Posix }
 
 
+{-| -}
 type Term
     = Word String
     | NotWord String
     | Conjunction (List Term)
     | BeforeDateTime Time.Posix
     | AfterDateTime Time.Posix
-
-
-beforeJuly_ = BeforeDateTime (Time.millisToPosix 1625183999000)
-afterJuly_ = AfterDateTime (Time.millisToPosix 1625183999000)
-
-nullTerm = Word "null"
-
--- type alias Configuration= {
---       sort : List Sort
---     , filter : List Filter
---   }

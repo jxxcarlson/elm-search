@@ -1,14 +1,12 @@
 module Example exposing (..)
 
 import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Parse exposing(parse)
 import APITypes exposing(Datum, Term(..))
-import Search exposing(search)
 import Filter exposing(sort, SortParam(..), Direction(..))
 import Time exposing(Posix)
-import Search exposing (SearchConfig(..), posixGTE, searchWithTerm, posixLTE, posixGTEForDatum, posixLTEForDatum)
+import Search exposing (SearchConfig(..), search)
 
 
 
@@ -40,15 +38,15 @@ suite =
                     |> Expect.equal [d2,d3]
             ,  test "date search (0)" <|
              \_ ->
-                search NotCaseSensitive "@before:9/1/2001" [d1, d2, d3, d4, d5]
+                search NotCaseSensitive "@before:9/1/2021" [d1, d2, d3, d4, d5]
                     |> Expect.equal [d1, d2, d3]
 
           ,  test "date search (1)" <|
              \_ ->
-                search NotCaseSensitive "@after:9/1/2001" [d1, d2, d3, d4, d5]
+                search NotCaseSensitive "@after:9/1/2021" [d1, d2, d3, d4, d5]
                     |> Expect.equal [d3, d4, d5]
 
-            , test "case senstive conjunctive search (0)" <|
+            , test "case sensitive conjunctive search (0)" <|
              \_ ->
                 search CaseSensitive "Foo" data
                     |> Expect.equal [] 
@@ -72,49 +70,53 @@ suite =
             \_ -> sort (DateTime Decreasing)  [d3, d4, d5, d1, d2]
               |> Expect.equal (List.reverse [d1, d2, d3, d4, d5])
             
-            , test "posixGTE (1)" <| 
-               \_ -> posixGTE august july
-                |> Expect.equal True
-
-             , test "posixGTE (2)" <| 
-               \_ -> posixGTE july august
-                |> Expect.equal False
-
-           , test "posixLTE (1)" <| 
-               \_ -> posixLTE august july
-                |> Expect.equal False
-
-            , test "posixLTE (2)" <| 
-               \_ -> posixLTE july august
-                |> Expect.equal True
-
-           , test "posixLTEForDatum (1)" <|
-             \_ -> posixLTEForDatum augustDatum june
-             |> Expect.equal False
-
-
-           , test "posixLTEForDatum (2)" <|
-             \_ -> posixLTEForDatum juneDatum august
-             |> Expect.equal True
-
-
-
-           , test "posixGTEForDatum (1)" <|
-             \_ -> posixGTEForDatum augustDatum june
-             |> Expect.equal True
-
-
-           , test "posixGTEForData (2)" <|
-             \_ -> posixGTEForDatum juneDatum august
-             |> Expect.equal False
-
-           , test "searchWithTerm (1)" <| 
-             \_ ->  searchWithTerm CaseSensitive beforeJuly_ [juneDatum]
-               |> Expect.equal [{ content = "JUNE", dateTime = Time.millisToPosix 1622591999000 }]
-
-           , test "searchWithTerm (2)" <| 
-             \_ ->  searchWithTerm CaseSensitive afterJuly_ [juneDatum]
-               |> Expect.equal []
+           -- , test "posixGTE (1)" <|
+           --    \_ -> posixGTE august july
+           --     |> Expect.equal True
+           --
+           --  , test "posixGTE (2)" <|
+           --    \_ -> posixGTE july august
+           --     |> Expect.equal False
+           --
+           --, test "posixLTE (1)" <|
+           --    \_ -> posixLTE august july
+           --     |> Expect.equal False
+           --
+           -- , test "posixLTE (2)" <|
+           --    \_ -> posixLTE july august
+           --     |> Expect.equal True
+           --
+           --, test "posixLTEForDatum (1)" <|
+           --  \_ -> posixLTEForDatum augustDatum june
+           --  |> Expect.equal False
+           --
+           --
+           --, test "posixLTEForDatum (2)" <|
+           --  \_ -> posixLTEForDatum juneDatum august
+           --  |> Expect.equal True
+           --
+           --
+           --
+           --, test "posixGTEForDatum (1)" <|
+           --  \_ -> posixGTEForDatum augustDatum june
+           --  |> Expect.equal True
+           --
+           --
+           --, test "posixGTEForData (2)" <|
+           --  \_ -> posixGTEForDatum juneDatum august
+           --  |> Expect.equal False
+           --
+           --, test "searchWithTerm (1)" <|
+           --  \_ ->  searchWithTerm CaseSensitive beforeJuly_ [juneDatum]
+           --    |> Expect.equal [{ content = "JUNE", dateTime = Time.millisToPosix 1622591999000 }]
+           --
+           --, test "searchWithTerm (2)" <|
+           --  \_ ->  searchWithTerm CaseSensitive afterJuly_ [juneDatum]
+           --    |> Expect.equal []
+           --
+           --, test "searchWithTerm (3)" <|
+           --  \_ -> searchWithTerm CaseSensitive (Conjunction [Word "foo",Word "bar"]) data
+           --  |> Expect.equal [d2]
 
          , test "search (1)" <| 
              \_ ->  search CaseSensitive "@before:7/1/2021" [juneDatum]
@@ -123,6 +125,8 @@ suite =
         , test "search (2)" <| 
              \_ ->  search CaseSensitive "@after:7/1/2021" [juneDatum]
                |> Expect.equal []
+
+
 
  
         ]
