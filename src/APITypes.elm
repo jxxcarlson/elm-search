@@ -1,4 +1,4 @@
-module APITypes exposing (Term(..), Datum)
+module APITypes exposing (Term(..), SearchTarget, targetMillis, targetContent, targetDate)
 
 {-|
 
@@ -10,8 +10,7 @@ import Time
 
 
 {-| -}
-type alias Datum data =
-    { data | content : String, dateTime : Time.Posix }
+type alias SearchTarget = {targetContent : String , targetDate : Time.Posix }
 
 
 {-| -}
@@ -22,3 +21,16 @@ type Term
     | BeforeDateTime Time.Posix
     | AfterDateTime Time.Posix
     | Range Time.Posix Time.Posix
+
+
+targetContent : (a -> SearchTarget) -> a -> String
+targetContent transform a =
+    (transform a).targetContent
+
+targetDate : (a -> SearchTarget) -> a -> Time.Posix
+targetDate transform a =
+    (transform a).targetDate
+
+targetMillis : (a -> SearchTarget) -> a -> Int
+targetMillis transform a =
+    (transform a).targetDate |> Time.posixToMillis

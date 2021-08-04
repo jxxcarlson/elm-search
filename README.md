@@ -1,7 +1,23 @@
 # Search
 
-A library for searching and sorting lists of data 
-with fields `content: String` and `dateTime: Time.Posix`.
+A library for searching and sorting lists of data.
+
+Suppose we have data with fields `title: String` and `creationDate: Teime.Posix` and others.
+First, we rig up a function
+
+```elm
+dataTransform : {a | title : String , creationDate : Time.Posix} 
+                -> {targetContent : String, targetDate : Time.Posix }
+dataTransform  { content, dateTime } = {targetContent = content , targetDate = dateTime }
+```
+
+Second, we define
+
+```elm
+search = Search.search dataTransform
+sort = Sort.sort dataTransform
+```
+Then we can do searches and sorts as below:
 
 
 ## Examples
@@ -35,7 +51,7 @@ Search on fragments
 
 Conjunctive search
 ```
-> search NotCaseSensitive "yell french" colors 
+> search NotCaseSensitive  "yell french" colors 
   |> List.map .content
   ["french yellow"] : List String
 ```
@@ -49,7 +65,7 @@ Negation
 
 Date-time:
 ```
-> search NotCaseSensitive "@before:7/1/2021" colors 
+> search NotCaseSensitive  "@before:7/1/2021" colors 
   |> List.map .content
   ["alizarin yellow","brown umber"]
 ```
@@ -83,7 +99,7 @@ Date-time and word fragment
 ### Random order
 
 ```
-> sort (Random seed1) colors 
+> sort tranform (Random seed1) colors 
   |> List.map .content
   ["alizarin crimson, cadmium purple","alizarin yellow"
   ,"brown umber","yellow ochre","french yellow","pthalo blue"]

@@ -6,7 +6,7 @@ module Sort exposing (sort, SortParam(..), Direction(..))
 
 -}
 
-import APITypes exposing (Datum)
+import APITypes exposing (SearchTarget, targetDate, targetContent, targetMillis)
 import Random
 import Random.List
 import Time
@@ -36,20 +36,20 @@ type Filter
 
 
 {-| -}
-sort : SortParam -> List (Datum data) -> List (Datum data)
-sort param dataList =
+sort : (a -> SearchTarget) -> SortParam ->  List a -> List a
+sort transform param  dataList =
     case param of
         Alpha Increasing ->
-            List.sortWith (\a b -> compare a.content b.content) dataList
+            List.sortWith (\a b -> compare (targetContent transform a) (targetContent transform b)) dataList
 
         Alpha Decreasing ->
-            List.sortWith (\a b -> compare b.content a.content) dataList
+            List.sortWith (\a b -> compare (targetContent transform b) (targetContent transform a)) dataList
 
         DateTime Increasing ->
-            List.sortWith (\a b -> compare (Time.posixToMillis a.dateTime) (Time.posixToMillis b.dateTime)) dataList
+            List.sortWith (\a b -> compare (targetMillis transform a) (targetMillis transform b)) dataList
 
         DateTime Decreasing ->
-            List.sortWith (\a b -> compare (Time.posixToMillis b.dateTime) (Time.posixToMillis a.dateTime)) dataList
+            List.sortWith (\a b -> compare (targetMillis transform b) (targetMillis transform a)) dataList
 
         Random seed ->
             Random.step (Random.List.shuffle dataList) seed |> Tuple.first
