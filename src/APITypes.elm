@@ -2,7 +2,7 @@ module APITypes exposing (Term(..), SearchTarget, targetMillis, targetContent, t
 
 {-|
 
-@docs Term, Datum, targetMillis, targetContent, targetDate
+@docs Term,  SearchTarget,  targetMillis, targetContent, targetDate
 
 -}
 
