@@ -2,7 +2,7 @@ module APITypes exposing (Term(..), SearchTarget, targetMillis, targetContent, t
 
 {-|
 
-@docs Term, Datum
+@docs Term, Datum, targetMillis, targetContent, targetDate
 
 -}
 
@@ -22,15 +22,17 @@ type Term
     | AfterDateTime Time.Posix
     | Range Time.Posix Time.Posix
 
-
+{-| -}
 targetContent : (a -> SearchTarget) -> a -> String
 targetContent transform a =
     (transform a).targetContent
 
+{-| -}
 targetDate : (a -> SearchTarget) -> a -> Time.Posix
 targetDate transform a =
     (transform a).targetDate
 
+{-| -}
 targetMillis : (a -> SearchTarget) -> a -> Int
 targetMillis transform a =
     (transform a).targetDate |> Time.posixToMillis
