@@ -116,7 +116,7 @@ term =
 -}
 positiveWord : Parser Term
 positiveWord =
-    text Char.isAlphaNum (\c -> c /= ' ') |> Parser.map .content |> Parser.map Word
+    text (\c -> Char.isAlphaNum c || c == ':' || c == '!' || c == '\u{2605}') (\c -> c /= ' ') |> Parser.map .content |> Parser.map Word
 
 
 {-|
